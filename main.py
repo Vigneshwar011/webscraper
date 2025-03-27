@@ -1,4 +1,3 @@
-
 import streamlit as st
 from scrape import (
     scrape_website, 
@@ -7,41 +6,40 @@ from scrape import (
     extract_body_content
 )
 from parse import parse_with_ollama
+from database import create_table, insert_parsed_data  # Import database functions
 
-st.title("AI Web Scraper")
+#  Create the database table when the app starts
+create_table()
+
+st.title("AI Web Scraper & Database Storage")
+
 url = st.text_input("Enter a Website URL: ")
 
 if st.button("Scrape Site"):
-    st.write("Scraping the website...")  # Text for status message
+    st.write("🔍 Scraping the website...")
     result = scrape_website(url)
     body_content = extract_body_content(result)
     cleaned_content = clean_body_content(body_content)
 
-    # Save cleaned content in session state
     st.session_state.dom_content = cleaned_content
 
-    # Display the DOM content in an expandable section
-    with st.expander("View DOM Content"):
+    with st.expander("🔹 View DOM Content"):
         st.text_area("DOM Content", cleaned_content, height=300)
 
-# Check if dom_content exists in session state
 if "dom_content" in st.session_state:
-    parse_description = st.text_area("Describe what you want to parse?")
+    parse_description = st.text_area("✍️ Describe what you want to parse:")
 
     if st.button("Parse Content"):
         if parse_description:
-            st.write("Parsing the content...")
+            st.write("🔄 Parsing the content...")
             dom_chunks = split_dom_content(st.session_state.dom_content)
             result = parse_with_ollama(dom_chunks, parse_description)
-            st.write(result)
             
-            # Assuming `split_dom_content` returns a list of chunks
-            if dom_chunks:
-                st.write(f"Parsed {len(dom_chunks)} chunks from the DOM content.")
-                # Show the parsed content chunks (if needed)
-                for idx, chunk in enumerate(dom_chunks):
-                    st.write(f"Chunk {idx + 1}: {chunk[:500]}...")  # Display the first 500 chars of each chunk
-            else:
-                st.write("No chunks found to parse.")
+            # ✅ Store parsed data in the database
+            response = insert_parsed_data(url, result)
+            st.write(response)
+
+            st.write("✅ Parsing & Database Storage Complete.")
         else:
-            st.write("Please describe what you want to parse.")
+            st.write("⚠️ Please describe what you want to parse.")
+
