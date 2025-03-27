@@ -30,12 +30,16 @@ def scrape_website(website):
         # Close the browser
         driver.quit()
 
-def extract_body_content(html_content):
-    soup = BeautifulSoup(html_content, "html.parser")
-    body_content = soup.body
-    if body_content:
-        return str(body_content)
-    return ""
+def extract_body_content(html):
+    soup = BeautifulSoup(html, "html.parser")
+    
+    # Extracting text while preserving important structure
+    for script in soup(["script", "style"]):  
+        script.extract()  # Remove script and style elements
+    
+    text = soup.get_text(separator="\n")  # Preserve structure with newlines
+    
+    return text.strip()  # Return cleaned text
 
 def clean_body_content(body_content):
     soup = BeautifulSoup(body_content, "html.parser")
@@ -50,8 +54,7 @@ def clean_body_content(body_content):
 
     return cleaned_content
 
-def split_dom_content(dom_content, max_length = 6000):
-    return{
-        dom_content[i: i+max_length] for i in range(0, len(dom_content), max_length)
-    }
+def split_dom_content(content, chunk_size=2000):  
+    """Splits content into chunks (increase chunk_size if content is cut off)."""
+    return [content[i:i+chunk_size] for i in range(0, len(content), chunk_size)]
 
