@@ -45,3 +45,6 @@ def insert_parsed_data(url, parsed_content):
         return f" Added new data for {url}"
     else:
         return f" Data already exists for {url}"
+
+
+
