@@ -64,8 +64,3 @@ if os.path.exists("faiss_index/index.faiss"):
 else:
     st.info("ℹ️ Please parse content before asking questions.")
 
-
-            st.write("✅ Parsing & Database Storage Complete.")
-        else:
-            st.write("⚠️ Please describe what you want to parse.")
-
