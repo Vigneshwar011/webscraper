@@ -42,6 +42,6 @@ def insert_parsed_data(url, parsed_content):
         cursor.execute("INSERT INTO extracted_data (url, parsed_content) VALUES (?, ?)", (url, parsed_json))
         conn.commit()
         conn.close()
-        return f"✅ Added new data for {url}"
+        return f" Added new data for {url}"
     else:
-        return f"⚠️ Data already exists for {url}"
+        return f" Data already exists for {url}"
